@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 import uvicorn
-from routers import ticket_holders, ticket_holder_guests, issued_tickets, ticket_types, ticket_holder_types
+from api import ticket_holders, ticket_holder_guests, issued_tickets, ticket_types, ticket_holder_types
+from frontend import login, artist, guestlist, press, help, home
 from database import Base, engine
 
 # Create tables
@@ -8,16 +9,20 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the Ticket Management API"}
+# Frontend routes
+app.include_router(home.router, tags=["home"])
+app.include_router(login.router, prefix="/login", tags=["login"])
+app.include_router(artist.router, prefix="/artist", tags=["artist"])
+app.include_router(guestlist.router, prefix="/guestlist", tags=["guestlist"])
+app.include_router(press.router, prefix="/press", tags=["press"])
+app.include_router(help.router, prefix="/help", tags=["help"])
 
-
-app.include_router(ticket_holders.router, prefix="/ticket_holders", tags=["ticket_holders"])
-app.include_router(ticket_holder_guests.router, prefix="/ticket_holder_guests", tags=["ticket_holder_guests"])
-app.include_router(issued_tickets.router, prefix="/issued_tickets", tags=["issued_tickets"])
-app.include_router(ticket_types.router, prefix="/ticket_types", tags=["ticket_types"])
-app.include_router(ticket_holder_types.router, prefix="/ticket_holder_types", tags=["ticket_holder_types"])
+# API routes
+app.include_router(ticket_holders.router, prefix="/ticket_holders", tags=["API/ticket_holders"])
+app.include_router(ticket_holder_guests.router, prefix="/ticket_holder_guests", tags=["API/ticket_holder_guests"])
+app.include_router(issued_tickets.router, prefix="/issued_tickets", tags=["API/issued_tickets"])
+app.include_router(ticket_types.router, prefix="/ticket_types", tags=["API/ticket_types"])
+app.include_router(ticket_holder_types.router, prefix="/ticket_holder_types", tags=["API/ticket_holder_types"])
 
 
 if __name__ == "__main__":
