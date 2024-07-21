@@ -3,3 +3,4 @@ test.db
 .env
 traefik-users
 vols
+.DS_Store

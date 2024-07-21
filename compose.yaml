@@ -35,6 +35,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PW}@db/${POSTGRES_DB}
     labels:
       - traefik.enable=true
       - traefik.http.routers.bdsm.entrypoints=web

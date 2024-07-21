@@ -30,6 +30,9 @@ RUN adduser \
     --uid "${UID}" \
     appuser
 
+# Install PostgreSQL development headers and libraries
+RUN apt-get update && apt-get install -y gcc libpq-dev
+
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
 # Leverage a bind mount to requirements.txt to avoid having to copy them into
