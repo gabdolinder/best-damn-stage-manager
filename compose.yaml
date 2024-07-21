@@ -7,17 +7,14 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - letsencrypt:/letsencrypt
-      #- /var/log:/var/log
     command:
       - --api.dashboard=true
       - --log.level=INFO
       - --accesslog=true
+      - --providers.docker=true
       - --providers.docker.exposedByDefault=false
       - --entrypoints.web.address=:80
-      - --entrypoints.web.http.redirections.entrypoint.to=websecure
-      - --entryPoints.web.http.redirections.entrypoint.scheme=https
       - --entrypoints.websecure.address=:443
-      - --entrypoints.websecure.asDefault=true 
       - --entrypoints.websecure.http.tls.certresolver=myresolver
       - --certificatesresolvers.myresolver.acme.email=${TR_EMAIL}
       - --certificatesresolvers.myresolver.acme.tlschallenge=true
@@ -40,11 +37,12 @@ services:
         condition: service_healthy
     labels:
       - traefik.enable=true
+      - traefik.http.routers.bdsm.entrypoints=web
       - traefik.http.routers.bdsm.rule=Host(`${TR_DOMAIN_NAME}`) || Host(`www.${TR_DOMAIN_NAME}`)
-      - traefik.http.services.bdsm.loadbalancer.server.port=80
-      - traefik.http.middlewares.mywwwredirect.redirectregex.regex=^https://www\.(.*)
-      - traefik.http.middlewares.mywwwredirect.redirectregex.replacement=https://$${1}
-      - traefik.http.routers.bdsm.middlewares=mywwwredirect
+      - traefik.http.middlewares.bdsm-https-redir.redirectscheme.scheme=https
+      - traefik.http.routers.bdsm-secure.entrypoints=websecure
+      - traefik.http.routers.bdsm-secure.rule=Host(`${TR_DOMAIN_NAME}`) || Host(`www.${TR_DOMAIN_NAME}`)
+      - traefik.http.services.bdsm.loadbalancer.server.port=8000
 
   db:
     container_name: postgres
