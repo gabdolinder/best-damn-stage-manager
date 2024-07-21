@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 # Base schema for TicketHolder, used to define shared attributes and validation rules
 class TicketHolderBase(BaseModel):
+    id: int
     name: str
     persnum: str
     ticket_holder_type_id: int
@@ -15,6 +16,7 @@ class TicketHolderCreate(TicketHolderBase):
 
 # Base schema for TicketHolderGuest, used to define shared attributes and validation rules
 class TicketHolderGuestBase(BaseModel):
+    id: int
     name: str
     persnum: str
     guest_to_artist_id: int
@@ -28,7 +30,10 @@ class TicketHolderGuestCreate(TicketHolderGuestBase):
 
 # Base schema for IssuedTicket, used to define shared attributes and validation rules
 class IssuedTicketBase(BaseModel):
+    id: int
     name_id: int
+    ticket_holder_id: int
+    ticket_holder_guest_id: int
     status: bool
     ticket_type_id: int
 
@@ -41,6 +46,7 @@ class IssuedTicketCreate(IssuedTicketBase):
 
 # Base schema for TicketType, used to define shared attributes and validation rules
 class TicketTypeBase(BaseModel):
+    id: int
     ticket_type: str
 
     class Config:
@@ -52,6 +58,7 @@ class TicketTypeCreate(TicketTypeBase):
 
 # Base schema for TicketHolderType, used to define shared attributes and validation rules
 class TicketHolderTypeBase(BaseModel):
+    id: int
     ticket_holder_type: str
 
     class Config:

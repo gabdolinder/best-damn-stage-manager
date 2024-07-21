@@ -19,7 +19,8 @@ class TicketHolderGuest(Base):
 class IssuedTicket(Base):
     __tablename__ = 'issued_ticket'
     id = Column(Integer, primary_key=True, index=True)
-    name_id = Column(Integer)  # This will reference ticket_holder or ticket_holder_guest
+    ticket_holder_id = Column(Integer, ForeignKey('ticket_holder.id'))
+    ticket_holder_guest_id = Column(Integer, ForeignKey('ticket_holder_guest.id'))
     status = Column(Boolean, default=True)
     ticket_type_id = Column(Integer, ForeignKey('ticket_type.id'))
 
