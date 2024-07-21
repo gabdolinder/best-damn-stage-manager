@@ -1,0 +1,72 @@
+services:
+  traefik:
+    image: traefik:v3.1.0
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - letsencrypt:/letsencrypt
+    command:
+      - --api.dashboard=true
+      - --log.level=INFO
+      - --accesslog=true
+      - --providers.docker=true
+      - --providers.docker.exposedByDefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls.certresolver=myresolver
+      - --certificatesresolvers.myresolver.acme.email=${TR_EMAIL}
+      - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mydashboard.rule=Host(`traefik.${TR_DOMAIN_NAME}`)
+      - traefik.http.routers.mydashboard.service=api@internal
+      - traefik.http.routers.mydashboard.middlewares=myauth
+      - traefik.http.middlewares.myauth.basicauth.users=${TR_AUTH}
+
+  bdsm:
+    container_name: bdsm
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bdsm.entrypoints=web
+      - traefik.http.routers.bdsm.rule=Host(`${TR_DOMAIN_NAME}`) || Host(`www.${TR_DOMAIN_NAME}`)
+      - traefik.http.middlewares.bdsm-https-redir.redirectscheme.scheme=https
+      - traefik.http.routers.bdsm-secure.entrypoints=websecure
+      - traefik.http.routers.bdsm-secure.rule=Host(`${TR_DOMAIN_NAME}`) || Host(`www.${TR_DOMAIN_NAME}`)
+      - traefik.http.services.bdsm.loadbalancer.server.port=8000
+
+  db:
+    container_name: postgres
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PW}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - ./vols/database/:/var/lib/postgresql/data
+    expose:
+      - 5432
+
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  proxy:
+    name: proxy
+
+volumes:
+  letsencrypt:
+    name: letsencrypt
