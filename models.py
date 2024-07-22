@@ -5,15 +5,16 @@ from database import Base
 class TicketHolder(Base):
     __tablename__ = 'ticket_holder'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    persnum = Column(String, index=True)
+    pers_name = Column(String, index=True)
+    pers_num = Column(String, index=True)
+    related_act = Column(String, index=True)
     ticket_holder_type_id = Column(Integer, ForeignKey('ticket_holder_type.id'))
 
 class TicketHolderGuest(Base):
     __tablename__ = 'ticket_holder_guest'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    persnum = Column(String, index=True)
+    pers_name = Column(String, index=True)
+    pers_num = Column(String, index=True)
     guest_to_artist_id = Column(Integer, ForeignKey('ticket_holder.id'))
 
 class IssuedTicket(Base):

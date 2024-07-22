@@ -3,8 +3,9 @@ from pydantic import BaseModel
 # Base schema for TicketHolder, used to define shared attributes and validation rules
 class TicketHolderBase(BaseModel):
     id: int
-    name: str
-    persnum: str
+    pers_name: str
+    pers_num: str
+    related_act: str
     ticket_holder_type_id: int
 
     class Config:
@@ -17,8 +18,8 @@ class TicketHolderCreate(TicketHolderBase):
 # Base schema for TicketHolderGuest, used to define shared attributes and validation rules
 class TicketHolderGuestBase(BaseModel):
     id: int
-    name: str
-    persnum: str
+    pers_name: str
+    pers_num: str
     guest_to_artist_id: int
 
     class Config:
