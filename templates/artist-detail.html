@@ -1,0 +1,49 @@
+{% include 'components/start.html' %}
+
+<body>
+{% include 'components/navbar.html' %}
+    <h1>{{artist['name']}} details</h1>
+    <div class="p-5">
+        <h2>Tickets</h2>
+        <table data-toggle="table" class="table">
+            <thead>
+                <tr>
+                    <th>Ticket type</th>
+                    <th>Checked in</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Artistband Onsdag</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>Dagsbiljett Torsdag</td>
+                    <td>No</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="p-5">
+        <h2>Guests</h2>
+        <table data-toggle="table" data-search="true" class="table">
+            <thead>
+                <tr>
+                    <th>Guest</th>
+                    <th>Checked in</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Anders Andersson</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>Henrietta Olsson</td>
+                    <td>No</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+{% include 'components/end.html' %}
