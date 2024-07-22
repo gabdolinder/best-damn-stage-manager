@@ -2,6 +2,26 @@
 
 <body>
 {% include 'components/navbar.html' %}
-    <p>Artist</p>
+    <h1>Artist list</h1>
+    <div class="p-5">
+        <table data-toggle="table" data-search="true" class="table">
+            <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>Personal Number</td>
+                    <td>Related act</td>
+                </tr>
+            </thead>
+            <tbody>
+            {% for a in artist_list %}
+                <tr>
+                    <td><a href="{{ url_for('render_artist_list') }}{{ a['id'] }}">{{ a['name'] }}</a></td>
+                    <td>{{ a['pers_num'] }}</td>
+                    <td>{{ a['related_act'] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 {% include 'components/end.html' %}
