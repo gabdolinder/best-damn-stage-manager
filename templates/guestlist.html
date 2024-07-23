@@ -2,7 +2,26 @@
 
 <body>
 {% include 'components/navbar.html' %}
-
-    <p>Guestlist</p>
+    <div class="p-5">
+        <h1>Guest list</h1>
+        <table data-toggle="table" data-search="true" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Guest to</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for guest in guest_list %}
+                <tr>
+                    <td><a href="{{ url_for('render_guest_list') }}{{ guest['id'] }}">{{ guest['pers_name'] }}</a></td>
+                    <td> {% for artist in artist_list %} {% if artist['id'] == guest['guest_to_artist_id'] %} {{artist['pers_name']}}  {% endif %} {% endfor %} </td>
+                    <td><i class="bi-check-square-fill" style="color:green"></i> <i class="bi-x-square-fill icon-danger" style="color:crimson"></i></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 {% include 'components/end.html' %}

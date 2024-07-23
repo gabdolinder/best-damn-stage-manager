@@ -2,10 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from .dependencies import templates
 
+guest_list = [
+    {"id": 11, "guest_to_artist_id": 1, "pers_name": "Erik Johansson",},
+    {"id": 12, "guest_to_artist_id": 1, "pers_name": "Oliver Nilsson",},
+    {"id": 13, "guest_to_artist_id": 3, "pers_name": "Fredrik Augustsson",}
+]
+
 artist_list = [
-    {"id": 1, "name": "Anders Andersson", 'pers_num': '102030-4050', 'related_act':'Artistjanne',},
-    {"id": 2, "name": "Johan Olsson", 'pers_num': '112233-4455', 'related_act':'Artistjanne',},
-    {"id": 3, "name": "Rickard Svensson", 'pers_num': '122334-4550', 'related_act': 'Greger',}
+    {"id": 1, "pers_name": "Anders Andersson", 'related_act':'Artistjanne',},
+    {"id": 2, "pers_name": "Johan Olsson", 'related_act':'Artistjanne',},
+    {"id": 3, "pers_name": "Rickard Svensson", 'related_act': 'Greger',}
 ]
 
 router = APIRouter()
@@ -18,9 +24,16 @@ def render_artist_list(request: Request):
 @router.get("/{artist_id}", response_class=HTMLResponse)
 def get_artist(artist_id: int, request: Request):
 
+    # Find all data for artist with the given artist_id
     for item in artist_list:
         if item['id'] == artist_id:
             artist = item
 
-    context = {'request': request, 'artist': artist}
+    # Create an artist specific guest list for the given artist_id
+    artist_guests = []
+    for item in guest_list:
+        if item['guest_to_artist_id'] == artist_id:
+            artist_guests.append(item)
+
+    context = {'request': request, 'artist': artist, 'artist_guests': artist_guests}
     return templates.TemplateResponse("artist-detail.html", context)
