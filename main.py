@@ -1,10 +1,11 @@
 from fastapi import FastAPI, Depends
 import uvicorn
 from api import ticket_holders, ticket_holder_guests, issued_tickets, ticket_types, ticket_holder_types
-from frontend import login, artist, guestlist, press, help, home
 from database import Base, engine, SessionLocal
 from crud import insert_ticket_type_data
 from contextlib import asynccontextmanager
+from frontend import login, artist, guestlist, home
+
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -30,8 +31,6 @@ app.include_router(home.router, tags=["home"])
 app.include_router(login.router, prefix="/login", tags=["login"])
 app.include_router(artist.router, prefix="/artist", tags=["artist"])
 app.include_router(guestlist.router, prefix="/guestlist", tags=["guestlist"])
-app.include_router(press.router, prefix="/press", tags=["press"])
-app.include_router(help.router, prefix="/help", tags=["help"])
 
 # API routes
 app.include_router(ticket_holders.router, prefix="/ticket_holders", tags=["API/ticket_holders"])
