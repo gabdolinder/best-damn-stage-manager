@@ -37,7 +37,7 @@ docker-compose run --rm bdsm-migrate alembic downgrade -1
 ```
 
 ## Oh no, I deleted the version files and now I get an error!
-It happens to the best of all, what you do is that you log into the database
+It happens to the best of us, what you do is that you log into the database
 
 ```bash
 docker exec -it <postgres-container-name> psql -U <postgres-user>
