@@ -1,9 +1,10 @@
 services:
   traefik:
+    container_name: traefik
     image: traefik:v3.1.0
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - letsencrypt:/letsencrypt
@@ -31,12 +32,12 @@ services:
     build:
       context: .
     ports:
-      - 8000:8000
+      - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PW}@db/${POSTGRES_DB}
+      - DATABASE_URL=${DATABASE_URL}
     labels:
       - traefik.enable=true
       - traefik.http.routers.bdsm.entrypoints=web
@@ -45,30 +46,43 @@ services:
       - traefik.http.routers.bdsm-secure.entrypoints=websecure
       - traefik.http.routers.bdsm-secure.rule=Host(`${TR_DOMAIN_NAME}`) || Host(`www.${TR_DOMAIN_NAME}`)
       - traefik.http.services.bdsm.loadbalancer.server.port=8000
+    volumes:
+      - .:/app
+
 
   db:
-    container_name: postgres
-    image: postgres:latest
+    container_name: ${POSTGRES_CONTAINER_NAME}
+    image: postgres:16.3
     restart: always
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PW}
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
-      - ./vols/database/:/var/lib/postgresql/data
+      - database-data:/var/lib/postgresql/data
     expose:
-      - 5432
-
+      - "5432"
     healthcheck:
-      test: [ "CMD", "pg_isready" ]
+      test: ["CMD", "pg_isready"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-networks:
-  proxy:
-    name: proxy
+  bdsm-migrate:
+    container_name: bdsm-migrate
+    build: .
+    command: chmod -R 755 /alembic
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - ALEMBIC_DATABASE_URL=${ALEMBIC_DATABASE_URL}
+      - DATABASE_URL=${DATABASE_URL}
 
 volumes:
   letsencrypt:
     name: letsencrypt
+  database-data:
+    name: database-data

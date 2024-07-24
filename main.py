@@ -2,12 +2,28 @@ from fastapi import FastAPI, Depends
 import uvicorn
 from api import ticket_holders, ticket_holder_guests, issued_tickets, ticket_types, ticket_holder_types
 from frontend import login, artist, guestlist, press, help, home
-from database import Base, engine
+from database import Base, engine, SessionLocal
+from crud import insert_ticket_type_data
+from contextlib import asynccontextmanager
 
 # Create tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+def on_startup():
+    db = SessionLocal()
+    try:
+        insert_ticket_type_data(db)
+    finally:
+        db.close()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    on_startup()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 # Frontend routes
 app.include_router(home.router, tags=["home"])

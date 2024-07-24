@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from models import TicketHolder, TicketHolderGuest, IssuedTicket, TicketType, TicketHolderType
 from schemas import TicketHolderCreate, TicketHolderGuestCreate, IssuedTicketCreate, TicketTypeCreate, TicketHolderTypeCreate
 
@@ -46,13 +47,63 @@ def create_ticket_holder(db: Session, ticket_holder: TicketHolderCreate):
 def get_ticket_holder(db: Session, skip: int = 0, limit: int = 10):
     return db.query(TicketHolder).offset(skip).limit(limit).all()
 
-# functions for ticket_types
+# # functions for ticket_types
+# def create_ticket_type(db: Session, ticket_type: TicketTypeCreate):
+#     db_ticket_type = TicketType(**ticket_type.dict())
+#     db.add(db_ticket_type)
+#     db.commit()
+#     db.refresh(db_ticket_type)
+#     return db_ticket_type
+
+# def get_ticket_type(db: Session, skip: int = 0, limit: int = 10):
+#     return db.query(TicketType).offset(skip).limit(limit).all()
+
 def create_ticket_type(db: Session, ticket_type: TicketTypeCreate):
-    db_ticket_type = TicketType(**ticket_type.dict())
-    db.add(db_ticket_type)
+    db_create_ticket_type = TicketType(ticket_type=ticket_type.ticket_type)
+    db.add(db_create_ticket_type)
     db.commit()
-    db.refresh(db_ticket_type)
-    return db_ticket_type
+    db.refresh(db_create_ticket_type)
+    return db_create_ticket_type
 
 def get_ticket_type(db: Session, skip: int = 0, limit: int = 10):
     return db.query(TicketType).offset(skip).limit(limit).all()
+
+# def insert_ticket_type_data(db: Session):
+#     initial_ticket_types = [
+#         {"id":"1", "ticket_type": "veckoband"},
+#         {"id":"2", "ticket_type": "dagband onsdag"},
+#         {"id":"3", "ticket_type": "dagband torsdag"},
+#         {"id":"4", "ticket_type": "dagband fredag"},
+#         {"id":"5", "ticket_type": "dagband lördag"},
+#         {"id":"6", "ticket_type": "artistband onsdag"},
+#         {"id":"7", "ticket_type": "artistband torsdag"},
+#         {"id":"8", "ticket_type": "artistband fredag"},
+#         {"id":"9", "ticket_type": "artistband lördag"},
+#     ]
+    
+#     for ticket_type_data in initial_ticket_types:
+#         ticket_type = TicketTypeCreate(**ticket_type_data)
+#         try:
+#             create_ticket_type(db, ticket_type)
+#         except IntegrityError:
+#             db.rollback()  # Rollback if a duplicate entry causes an IntegrityError
+
+def insert_ticket_type_data(db: Session):
+    initial_ticket_types = [
+        {"ticket_type": "veckoband"},
+        {"ticket_type": "dagband onsdag"},
+        {"ticket_type": "dagband torsdag"},
+        {"ticket_type": "dagband fredag"},
+        {"ticket_type": "dagband lördag"},
+        {"ticket_type": "artistband onsdag"},
+        {"ticket_type": "artistband torsdag"},
+        {"ticket_type": "artistband fredag"},
+        {"ticket_type": "artistband lördag"},
+    ]
+    
+    for ticket_type_data in initial_ticket_types:
+        ticket_type = TicketTypeCreate(**ticket_type_data)
+        try:
+            create_ticket_type(db, ticket_type)
+        except IntegrityError:
+            db.rollback()  # Rollback if a duplicate entry causes an IntegrityError
