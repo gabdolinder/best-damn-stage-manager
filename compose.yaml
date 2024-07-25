@@ -47,7 +47,7 @@ services:
       - traefik.http.routers.bdsm-secure.rule=Host(`${TR_DOMAIN_NAME}`) || Host(`www.${TR_DOMAIN_NAME}`)
       - traefik.http.services.bdsm.loadbalancer.server.port=8000
     volumes:
-      - .:/app
+      - ./app:/app
 
 
   db:
