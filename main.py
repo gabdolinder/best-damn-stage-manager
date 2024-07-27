@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 import uvicorn
-from api import ticket_holders, ticket_holder_guests, issued_tickets, ticket_types, ticket_holder_types
+from api import ticket_holders, ticket_holder_guests, issued_tickets, ticket_types, ticket_holder_types, issue_ticket_artist, issue_ticket_guest
 from database import Base, engine, SessionLocal
 from crud import insert_ticket_type_data
 from contextlib import asynccontextmanager
@@ -38,7 +38,8 @@ app.include_router(ticket_holder_guests.router, prefix="/ticket_holder_guests", 
 app.include_router(issued_tickets.router, prefix="/issued_tickets", tags=["API/issued_tickets"])
 app.include_router(ticket_types.router, prefix="/ticket_types", tags=["API/ticket_types"])
 app.include_router(ticket_holder_types.router, prefix="/ticket_holder_types", tags=["API/ticket_holder_types"])
-
+app.include_router(issue_ticket_artist.router, prefix="/issue_ticket_artist", tags=["API/issue_ticket_artist"])
+app.include_router(issue_ticket_guest.router, prefix="/issue_ticket_guest", tags=["API/issue_ticket_guest"])
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
