@@ -35,8 +35,6 @@ def process_csv_data(csv_data: str, db: Session):
             TicketHolder.ticket_holder_name == row['ticket_holder_name'],
             TicketHolder.related_act == row['related_act']
         ).first()
-        if not ticket_holder:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Ticket holder {row['ticket_holder_name']} with act {row['related_act']} already exists")
 
         if not ticket_holder:
             # Create the ticket holder if it does not exist

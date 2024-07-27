@@ -40,7 +40,7 @@
             <tbody>
             {% for guest in artist_guests %}
                 <tr>
-                    <td><a href="{{ url_for('render_guest_list') }}{{ guest['id'] }}">{{ guest['ticket_holder_name'] }}</a></td>
+                    <td><a href="{{ url_for('render_guest_list') }}{{ guest['id'] }}">{{ guest['ticket_holder_guest_name'] }}</a></td>
                     <td><i class="bi-x-square-fill icon-danger" style="color:crimson"></i> Not checked in</td>
                 </tr>
             {% endfor %}
