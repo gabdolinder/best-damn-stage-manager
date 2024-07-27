@@ -3,15 +3,15 @@ from fastapi.responses import HTMLResponse
 from .dependencies import templates
 
 guest_list = [
-    {"id": 11, "guest_to_artist_id": 1, "pers_name": "Erik Johansson",},
-    {"id": 12, "guest_to_artist_id": 3, "pers_name": "Oliver Nilsson",},
-    {"id": 13, "guest_to_artist_id": 3, "pers_name": "Fredrik Augustsson",}
+    {"id": 11, "guest_to_artist_id": 1, "ticket_holder_guest_name": "Erik Johansson",},
+    {"id": 12, "guest_to_artist_id": 3, "ticket_holder_guest_name": "Oliver Nilsson",},
+    {"id": 13, "guest_to_artist_id": 3, "ticket_holder_guest_name": "Fredrik Augustsson",}
 ]
 
 artist_list = [
-    {"id": 1, "pers_name": "Anders Andersson", 'related_act':'Artistjanne',},
-    {"id": 2, "pers_name": "Johan Olsson", 'related_act':'Artistjanne',},
-    {"id": 3, "pers_name": "Rickard Svensson", 'related_act': 'Greger',}
+    {"id": 1, "ticket_holder_name": "Anders Andersson", 'related_act':'Artistjanne',},
+    {"id": 2, "ticket_holder_name": "Johan Olsson", 'related_act':'Artistjanne',},
+    {"id": 3, "ticket_holder_name": "Rickard Svensson", 'related_act': 'Greger',}
 ]
 
 router = APIRouter()

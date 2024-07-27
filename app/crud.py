@@ -3,6 +3,8 @@ from sqlalchemy.exc import IntegrityError
 from models import TicketHolder, TicketHolderGuest, IssuedTicket, TicketType, TicketHolderType
 from schemas import TicketHolderCreate, TicketHolderGuestCreate, IssuedTicketCreate, TicketTypeCreate, TicketHolderTypeCreate
 
+
+
 #functions for issued_tickets
 def create_issued_ticket(db: Session, issued_ticket: IssuedTicketCreate):
     db_issued_ticket = IssuedTicket(**issued_ticket.dict())
@@ -49,7 +51,7 @@ def get_ticket_holder(db: Session, skip: int = 0, limit: int = 10):
 
 #functions for ticket_type
 def create_ticket_type(db: Session, ticket_type: TicketTypeCreate):
-    db_create_ticket_type = TicketType(ticket_type=ticket_type.ticket_type)
+    db_create_ticket_type = TicketType(ticket_type_name=ticket_type.ticket_type_name)
     db.add(db_create_ticket_type)
     db.commit()
     db.refresh(db_create_ticket_type)
@@ -60,15 +62,15 @@ def get_ticket_type(db: Session, skip: int = 0, limit: int = 10):
 
 def insert_ticket_type_data(db: Session):
     initial_ticket_types = [
-        {"ticket_type": "veckoband"},
-        {"ticket_type": "dagband onsdag"},
-        {"ticket_type": "dagband torsdag"},
-        {"ticket_type": "dagband fredag"},
-        {"ticket_type": "dagband lördag"},
-        {"ticket_type": "artistband onsdag"},
-        {"ticket_type": "artistband torsdag"},
-        {"ticket_type": "artistband fredag"},
-        {"ticket_type": "artistband lördag"},
+        {"ticket_type_name": "veckoband"},
+        {"ticket_type_name": "dagband onsdag"},
+        {"ticket_type_name": "dagband torsdag"},
+        {"ticket_type_name": "dagband fredag"},
+        {"ticket_type_name": "dagband lördag"},
+        {"ticket_type_name": "artistband onsdag"},
+        {"ticket_type_name": "artistband torsdag"},
+        {"ticket_type_name": "artistband fredag"},
+        {"ticket_type_name": "artistband lördag"},
     ]
     
     for ticket_type_data in initial_ticket_types:

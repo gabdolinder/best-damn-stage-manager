@@ -3,8 +3,8 @@
 <body>
 {% include 'components/navbar.html' %}
     <div class="p-5">
-        <h1>{{guest['pers_name']}} details</h1>
-        <h2>This person is a guest of: <a href="{{ url_for('render_artist_list') }}{{ related_artist['id'] }}"> {{ related_artist['pers_name'] }} </a></h2>
+        <h1>{{guest['ticket_holder_guest_name']}} details</h1>
+        <h2>This person is a guest of: <a href="{{ url_for('render_artist_list') }}{{ related_artist['id'] }}"> {{ related_artist['ticket_holder_name'] }} </a></h2>
         <hr />
         <h2>Tickets</h2>
         <table data-toggle="table" class="table table-striped">

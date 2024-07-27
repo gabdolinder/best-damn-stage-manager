@@ -15,8 +15,8 @@
             <tbody>
             {% for guest in guest_list %}
                 <tr>
-                    <td><a href="{{ url_for('render_guest_list') }}{{ guest['id'] }}">{{ guest['pers_name'] }}</a></td>
-                    <td> {% for artist in artist_list %} {% if artist['id'] == guest['guest_to_artist_id'] %} {{artist['pers_name']}}  {% endif %} {% endfor %} </td>
+                    <td><a href="{{ url_for('render_guest_list') }}{{ guest['id'] }}">{{ guest['ticket_holder_guest_name'] }}</a></td>
+                    <td> {% for artist in artist_list %} {% if artist['id'] == guest['guest_to_artist_id'] %} {{artist['ticket_holder_name']}}  {% endif %} {% endfor %} </td>
                     <td><i class="bi-check-square-fill" style="color:green"></i> <i class="bi-x-square-fill icon-danger" style="color:crimson"></i></td>
                 </tr>
             {% endfor %}

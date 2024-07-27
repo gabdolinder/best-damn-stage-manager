@@ -2,10 +2,10 @@ from pydantic import BaseModel
 
 # Base schema for TicketHolder, used to define shared attributes and validation rules
 class TicketHolderBase(BaseModel):
-    pers_name: str
-    pers_num: str
+    ticket_holder_name: str
+    #pers_num: str
     related_act: str
-    ticket_holder_type_id: int
+    #ticket_holder_type_id: int
 
     class Config:
         orm_mode = True  # Enables ORM mode to work with SQLAlchemy models
@@ -16,9 +16,10 @@ class TicketHolderCreate(TicketHolderBase):
 
 # Base schema for TicketHolderGuest, used to define shared attributes and validation rules
 class TicketHolderGuestBase(BaseModel):
-    pers_name: str
-    pers_num: str
+    ticket_holder_guest_name: str
+    #pers_num: str
     guest_to_artist_id: int
+    artist_related_act: str
 
     class Config:
         orm_mode = True  # Enables ORM mode to work with SQLAlchemy models
@@ -29,7 +30,6 @@ class TicketHolderGuestCreate(TicketHolderGuestBase):
 
 # Base schema for IssuedTicket, used to define shared attributes and validation rules
 class IssuedTicketBase(BaseModel):
-    name_id: int
     ticket_holder_id: int
     ticket_holder_guest_id: int
     used: bool
@@ -55,7 +55,7 @@ class TicketHolderTypeCreate(TicketHolderTypeBase):
 
 # Base schema for TicketType, used to define shared attributes and validation rules
 class TicketTypeBase(BaseModel):
-    ticket_type: str
+    ticket_type_name: str
 
     class Config:
         orm_mode = True  # Enables ORM mode to work with SQLAlchemy models
