@@ -3,9 +3,6 @@
 <body>
 {% include 'components/navbar.html' %}
     <div class="p-5">
-        {% for t in artist_tickets %}
-        {{ t['ticket_type_name'] }}
-        {%endfor%}
         <h1>{{ artist['ticket_holder_name'] }} details</h1>
         <hr />
         <h2>Tickets</h2>
@@ -21,8 +18,12 @@
             {% for ticket in artist_tickets %}
                 <tr>
                     <td> {{ticket['ticket_type_name']}} </td>
-                    <td> llll </td>
-                    <td><button type="button" class="btn btn-primary btn-sm">Check In</button></td>
+                    <td>
+                        {% if ticket['used'] == True %} <i class="bi-check-square-fill" style="color:green"></i> Checked in
+                        {% else %} <i class="bi-x-square-fill icon-danger" style="color:crimson"></i> Not checked in
+                        {% endif %}
+                    </td>
+                    <td><a class="btn btn-primary btn-sm" href="/artist/{{ artist['ticket_holder_id'] }}/use_ticket/{{ ticket['ticket_id'] }}">Check In</a></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -34,14 +35,12 @@
             <thead>
                 <tr>
                     <th>Guest</th>
-                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
             {% for guest in artist_guests %}
                 <tr>
                     <td><a href="{{ url_for('render_guest_list') }}{{ guest['ticket_holder_guest_id'] }}">{{ guest['ticket_holder_guest_name'] }}</a></td>
-                    <td><i class="bi-x-square-fill icon-danger" style="color:crimson"></i> Not checked in</td>
                 </tr>
             {% endfor %}
             </tbody>

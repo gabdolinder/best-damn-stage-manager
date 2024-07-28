@@ -3,8 +3,6 @@ from sqlalchemy.exc import IntegrityError
 from models import TicketHolder, TicketHolderGuest, IssuedTicket, TicketType, TicketHolderType
 from schemas import TicketHolderCreate, TicketHolderGuestCreate, IssuedTicketCreate, TicketTypeCreate, TicketHolderTypeCreate
 
-
-
 #functions for issued_tickets
 def create_issued_ticket(db: Session, issued_ticket: IssuedTicketCreate):
     db_issued_ticket = IssuedTicket(**issued_ticket.dict())
@@ -17,10 +15,20 @@ def get_issued_ticket(db: Session, skip: int = 0, limit: int = 10):
     return db.query(IssuedTicket).offset(skip).limit(limit).all()
 
 def get_artist_issued_tickets(db: Session, artist_id: int):
-    return (db.query(TicketType)
+    return (db.query(TicketType.ticket_type_name, TicketType.ticket_type_id, IssuedTicket.ticket_id, IssuedTicket.used)
             .join(IssuedTicket)
             .filter(IssuedTicket.ticket_holder_id == artist_id, IssuedTicket.ticket_holder_guest_id == None)
             .all())
+
+def use_issued_ticket(db: Session, ticket_id: int):
+    db_issued_ticket = db.query(IssuedTicket).filter(IssuedTicket.ticket_id == ticket_id).first()
+    db_issued_ticket.used = True
+    db.commit()
+
+def return_issued_ticket(db: Session, ticket_id: int):
+    db_issued_ticket = db.query(IssuedTicket).filter(IssuedTicket.ticket_id == ticket_id).first()
+    db_issued_ticket.used = False
+    db.commit()
 
 #functions for ticket_holder_guests
 def create_ticket_holder_guest(db: Session, ticket_holder_guest: TicketHolderGuestCreate):
