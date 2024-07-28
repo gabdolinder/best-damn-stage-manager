@@ -3,7 +3,10 @@
 <body>
 {% include 'components/navbar.html' %}
     <div class="p-5">
-        <h1>{{artist['ticket_holder_name']}} details</h1>
+        {% for t in artist_tickets %}
+        {{ t['ticket_type_name'] }}
+        {%endfor%}
+        <h1>{{ artist['ticket_holder_name'] }} details</h1>
         <hr />
         <h2>Tickets</h2>
         <table data-toggle="table" class="table table-striped">
@@ -15,16 +18,13 @@
                 </tr>
             </thead>
             <tbody>
+            {% for ticket in artist_tickets %}
                 <tr>
-                    <td>Artistband Onsdag</td>
-                    <td>No</td>
+                    <td> {{ticket['ticket_type_name']}} </td>
+                    <td> llll </td>
                     <td><button type="button" class="btn btn-primary btn-sm">Check In</button></td>
                 </tr>
-                <tr>
-                    <td>Dagsbiljett Torsdag</td>
-                    <td>No</td>
-                    <td><button type="button" class="btn btn-primary btn-sm">Check In</button></td>
-                </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>
@@ -40,7 +40,7 @@
             <tbody>
             {% for guest in artist_guests %}
                 <tr>
-                    <td><a href="{{ url_for('render_guest_list') }}{{ guest['id'] }}">{{ guest['ticket_holder_guest_name'] }}</a></td>
+                    <td><a href="{{ url_for('render_guest_list') }}{{ guest['ticket_holder_guest_id'] }}">{{ guest['ticket_holder_guest_name'] }}</a></td>
                     <td><i class="bi-x-square-fill icon-danger" style="color:crimson"></i> Not checked in</td>
                 </tr>
             {% endfor %}

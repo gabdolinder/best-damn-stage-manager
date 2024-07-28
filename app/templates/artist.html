@@ -13,9 +13,9 @@
                 </tr>
             </thead>
             <tbody>
-            {% for a in artist_list %}
+            {% for a in ticket_holders %}
                 <tr>
-                    <td><a href="{{ url_for('render_artist_list') }}{{ a['id'] }}">{{ a['ticket_holder_name'] }}</a></td>
+                    <td><a href="{{ url_for('render_artist_list') }}{{ a['ticket_holder_id'] }}">{{ a['ticket_holder_name'] }}</a></td>
                     <td>{{ a['related_act'] }}</td>
                     <td><i class="bi-check-square-fill" style="color:green"></i> <i class="bi-x-square-fill icon-danger" style="color:crimson"></i></td>
                 </tr>
