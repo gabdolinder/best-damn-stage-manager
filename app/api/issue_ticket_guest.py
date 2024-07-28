@@ -1,11 +1,15 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from models import TicketHolder, TicketType, IssuedTicket, TicketHolderGuest
 from database import get_db
 import csv
 from pydantic import BaseModel
 from io import StringIO
+import logging
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -13,10 +17,17 @@ router = APIRouter()
 class CSVData(BaseModel):
     csv_data: str
 
-#insert ticket
+# Insert ticket
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def upload_csv(data: CSVData, db: Session = Depends(get_db)):
-    process_csv_data(data.csv_data, db)
+def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    try:
+        csv_data = file.file.read().decode("utf-8")
+        logger.info("CSV file read successfully")
+    except Exception as e:
+        logger.error(f"Error reading file: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error reading file: {str(e)}")
+
+    process_csv_data(csv_data, db)
     return {"Message": "Data inserted"}
 
 
