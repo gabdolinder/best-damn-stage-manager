@@ -17,8 +17,10 @@ def get_issued_ticket(db: Session, skip: int = 0, limit: int = 10):
     return db.query(IssuedTicket).offset(skip).limit(limit).all()
 
 def get_artist_issued_tickets(db: Session, artist_id: int):
-    # return db.query(IssuedTicket).filter(IssuedTicket.ticket_holder_id == artist_id, IssuedTicket.ticket_holder_guest_id == None).all()
-    return db.query(IssuedTicket).join(IssuedTicket.ticket_type_id).filter(IssuedTicket.ticket_holder_id == artist_id, IssuedTicket.ticket_holder_guest_id == None).all()
+    return (db.query(TicketType)
+            .join(IssuedTicket)
+            .filter(IssuedTicket.ticket_holder_id == artist_id, IssuedTicket.ticket_holder_guest_id == None)
+            .all())
 
 #functions for ticket_holder_guests
 def create_ticket_holder_guest(db: Session, ticket_holder_guest: TicketHolderGuestCreate):
