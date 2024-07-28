@@ -17,12 +17,6 @@ router = APIRouter()
 class CSVData(BaseModel):
     csv_data: str
 
-# #insert ticket
-# @router.post("/", status_code=status.HTTP_201_CREATED)
-# def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
-#     csv_data = file.file.read().decode("utf-8")
-#     process_csv_data(csv_data, db)
-#     return {"Message": "Data inserted"}
 
 # Insert ticket
 @router.post("/", status_code=status.HTTP_201_CREATED)
