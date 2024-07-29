@@ -57,6 +57,15 @@ def process_csv_data(csv_data: str, db: Session):
             db.commit()
             db.refresh(ticket_holder)
         
+        # Check if a ticket holder with the same name, act and ticket type already exists
+        existing_ticket = db.query(IssuedTicket).filter(
+            IssuedTicket.ticket_holder_id == ticket_holder.ticket_holder_id,
+            IssuedTicket.ticket_type_id == ticket_type.ticket_type_id
+        ).first()
+
+        if existing_ticket:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Ticket for {row['ticket_holder_name']} in act {row['related_act']} with ticket {row['ticket_type_name']} already exists")
+
         used_value = row.get('used', 'false').strip().lower() in ('true', '1', 'yes')
         
         # Create the issued ticket
