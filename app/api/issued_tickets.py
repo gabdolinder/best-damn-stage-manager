@@ -11,6 +11,6 @@ def create_new_issued_ticket(issued_ticket: IssuedTicketCreate, db: Session = De
     return create_issued_ticket(db=db, issued_ticket=issued_ticket)
 
 @router.get("/", response_model=list[IssuedTicketBase])
-def read_issued_tickets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    issued_tickets = get_issued_ticket(db, skip=skip, limit=limit)
+def read_issued_tickets(db: Session = Depends(get_db)):
+    issued_tickets = get_issued_ticket(db)
     return issued_tickets
