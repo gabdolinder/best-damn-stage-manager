@@ -11,8 +11,8 @@ def create_issued_ticket(db: Session, issued_ticket: IssuedTicketCreate):
     db.refresh(db_issued_ticket)
     return db_issued_ticket
 
-def get_issued_ticket(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(IssuedTicket).offset(skip).limit(limit).all()
+def get_issued_ticket(db: Session):
+    return db.query(IssuedTicket).all()
 
 def get_artist_issued_tickets(db: Session, artist_id: int):
     return (db.query(TicketType.ticket_type_name, TicketType.ticket_type_id, IssuedTicket.ticket_id, IssuedTicket.used)
@@ -38,8 +38,8 @@ def create_ticket_holder_guest(db: Session, ticket_holder_guest: TicketHolderGue
     db.refresh(db_ticket_holder_guest)
     return db_ticket_holder_guest
 
-def get_ticket_holder_guest(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(TicketHolderGuest).offset(skip).limit(limit).all()
+def get_ticket_holder_guest(db: Session):
+    return db.query(TicketHolderGuest).all()
 
 def get_specific_ticket_holder_guests(db: Session, artist_id: int ):
     return db.query(TicketHolderGuest).filter(TicketHolderGuest.guest_to_artist_id == artist_id).all()
@@ -63,8 +63,8 @@ def create_ticket_holder_type(db: Session, ticket_holder_type: TicketHolderTypeC
     db.refresh(db_ticket_holder_type)
     return db_ticket_holder_type
 
-def get_ticket_holder_type(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(TicketHolderType).offset(skip).limit(limit).all()
+def get_ticket_holder_type(db: Session):
+    return db.query(TicketHolderType).all()
 
 #functions for ticket_holders
 def create_ticket_holder(db: Session, ticket_holder: TicketHolderCreate):
@@ -74,8 +74,8 @@ def create_ticket_holder(db: Session, ticket_holder: TicketHolderCreate):
     db.refresh(db_ticket_holder)
     return db_ticket_holder
 
-def get_ticket_holder(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(TicketHolder).offset(skip).limit(limit).all()
+def get_ticket_holder(db: Session):
+    return db.query(TicketHolder).all()
 
 def get_specific_ticket_holder(db: Session, id: int):
     return db.query(TicketHolder).filter(TicketHolder.ticket_holder_id == id).first()
@@ -88,8 +88,8 @@ def create_ticket_type(db: Session, ticket_type: TicketTypeCreate):
     db.refresh(db_create_ticket_type)
     return db_create_ticket_type
 
-def get_ticket_type(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(TicketType).offset(skip).limit(limit).all()
+def get_ticket_type(db: Session):
+    return db.query(TicketType).all()
 
 def insert_ticket_type_data(db: Session):
     initial_ticket_types = [

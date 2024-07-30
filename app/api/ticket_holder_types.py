@@ -11,6 +11,6 @@ def create_new_ticket_holder_type(ticket_holder_type: TicketHolderTypeCreate, db
     return create_ticket_holder_type(db=db, ticket_holder_type=ticket_holder_type)
 
 @router.get("/", response_model=list[TicketHolderTypeBase])
-def read_ticket_holder_types(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    ticket_holder_types = get_ticket_holder_type(db, skip=skip, limit=limit)
+def read_ticket_holder_types(db: Session = Depends(get_db)):
+    ticket_holder_types = get_ticket_holder_type(db)
     return ticket_holder_types
