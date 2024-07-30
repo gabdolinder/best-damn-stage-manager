@@ -4,8 +4,9 @@
 {% include 'components/navbar.html' %}
     <div class="p-5">
         <h1>{{guest['ticket_holder_guest_name']}} details</h1>
-        <h2>This person is a guest of: <a href="{{ url_for('render_artist_list') }}{{ related_artist['id'] }}"> {{ related_artist['ticket_holder_name'] }} </a></h2>
         <hr />
+        <h2>This person is a guest of: <a href="{{ url_for('render_artist_list') }}{{ guest['guest_to_artist_id'] }}"> {{ guest['ticket_holder_name'] }} </a></h2>
+        <br />
         <h2>Tickets</h2>
         <table data-toggle="table" class="table table-striped">
             <thead>
@@ -17,14 +18,15 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>Artistband Onsdag</td>
-                    <td>No</td>
-                    <td><button type="button" class="btn btn-primary btn-sm">Check In</button></td>
-                </tr>
-                <tr>
-                    <td>Dagsbiljett Torsdag</td>
-                    <td>No</td>
-                    <td><button type="button" class="btn btn-primary btn-sm">Check In</button></td>
+                {% for ticket in guest_tickets %}
+                    <td> {{ ticket['ticket_type_name'] }} </td>
+                    <td>  
+                        {% if ticket['used'] == True %} <i class="bi-check-square-fill" style="color:green"></i> Checked in
+                        {% else %} <i class="bi-x-square-fill icon-danger" style="color:crimson"></i> Not checked in
+                        {% endif %}
+                    </td>
+                    <td><a class="btn btn-primary btn-sm" href="/guestlist/{{ guest['ticket_holder_guest_id'] }}/use_ticket/{{ ticket['ticket_id'] }}">Check In</a></td>
+                {% endfor %}
                 </tr>
             </tbody>
         </table>

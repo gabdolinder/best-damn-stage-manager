@@ -3,8 +3,14 @@ from fastapi.responses import HTMLResponse
 from .dependencies import templates
 from database import get_db
 from sqlalchemy.orm import Session
-from models import TicketHolder
-from crud import get_ticket_holder, get_specific_ticket_holder, get_specific_ticket_holder_guests, get_artist_issued_tickets, get_ticket_type, use_issued_ticket, return_issued_ticket
+from crud import (
+    get_ticket_holder, 
+    get_specific_ticket_holder, 
+    get_specific_ticket_holder_guests, 
+    get_artist_issued_tickets, 
+    use_issued_ticket, 
+    return_issued_ticket,
+)
 from fastapi.responses import RedirectResponse
 
 router = APIRouter()
@@ -14,7 +20,8 @@ def render_artist_list(request: Request, db: Session = Depends(get_db)):
 
     ticket_holders = get_ticket_holder(db)
 
-    context = {'request': request, 'ticket_holders': ticket_holders}
+    context = {'request': request, 
+               'ticket_holders': ticket_holders,}
     return templates.TemplateResponse("artist.html", context)
 
 

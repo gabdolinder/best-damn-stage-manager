@@ -8,6 +8,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - letsencrypt:/letsencrypt
+      - ./userfiles/webbusers:/webbusers
+      - ./userfiles/adminusers:/adminusers
     command:
       - --api.dashboard=true
       - --log.level=INFO
@@ -25,7 +27,7 @@ services:
       - traefik.http.routers.mydashboard.rule=Host(`traefik.${TR_DOMAIN_NAME}`)
       - traefik.http.routers.mydashboard.service=api@internal
       - traefik.http.routers.mydashboard.middlewares=myauth
-      - traefik.http.middlewares.myauth.basicauth.users=${TR_AUTH}
+      - traefik.http.middlewares.myauth.digestauth.usersfile=./adminusers
 
   bdsm:
     container_name: bdsm
@@ -42,9 +44,16 @@ services:
       - traefik.enable=true
       - traefik.http.routers.bdsm.entrypoints=web
       - traefik.http.routers.bdsm.rule=Host(`${TR_DOMAIN_NAME}`) || Host(`www.${TR_DOMAIN_NAME}`)
+      - traefik.http.routers.bdsm.middlewares=user-auth
       - traefik.http.middlewares.bdsm-https-redir.redirectscheme.scheme=https
       - traefik.http.routers.bdsm-secure.entrypoints=websecure
       - traefik.http.routers.bdsm-secure.rule=Host(`${TR_DOMAIN_NAME}`) || Host(`www.${TR_DOMAIN_NAME}`)
+      - traefik.http.routers.bdsm-secure.middlewares=user-auth
+      - traefik.http.middlewares.user-auth.digestauth.usersfile=./webbusers
+      - traefik.http.routers.bdsm-docs.entrypoints=websecure
+      - traefik.http.routers.bdsm-docs.rule=Host(`${TR_DOMAIN_NAME}`) && PathPrefix('/docs')
+      - traefik.http.routers.bdsm-docs.middlewares=admin-auth
+      - traefik.http.middlewares.admin-auth.digestauth.usersfile=./adminusers
       - traefik.http.services.bdsm.loadbalancer.server.port=8000
     volumes:
       - ./app:/app

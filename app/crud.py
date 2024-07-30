@@ -17,7 +17,7 @@ def get_issued_ticket(db: Session, skip: int = 0, limit: int = 10):
 def get_artist_issued_tickets(db: Session, artist_id: int):
     return (db.query(TicketType.ticket_type_name, TicketType.ticket_type_id, IssuedTicket.ticket_id, IssuedTicket.used)
             .join(IssuedTicket)
-            .filter(IssuedTicket.ticket_holder_id == artist_id, IssuedTicket.ticket_holder_guest_id == None)
+            .filter(IssuedTicket.ticket_holder_id == artist_id)
             .all())
 
 def use_issued_ticket(db: Session, ticket_id: int):
@@ -43,6 +43,17 @@ def get_ticket_holder_guest(db: Session, skip: int = 0, limit: int = 10):
 
 def get_specific_ticket_holder_guests(db: Session, artist_id: int ):
     return db.query(TicketHolderGuest).filter(TicketHolderGuest.guest_to_artist_id == artist_id).all()
+
+def get_specific_guest(db: Session, guest_id: int):
+    return (db.query(TicketHolderGuest.ticket_holder_guest_name, TicketHolderGuest.ticket_holder_guest_id, TicketHolderGuest.guest_to_artist_id, TicketHolder.ticket_holder_name)
+            .join(TicketHolder).filter(TicketHolderGuest.ticket_holder_guest_id == guest_id)
+            .first())
+
+def get_guest_issued_tickets(db: Session, guest_id: int):
+    return (db.query(TicketType.ticket_type_name, TicketType.ticket_type_id, IssuedTicket.ticket_id, IssuedTicket.used)
+            .join(IssuedTicket)
+            .filter(IssuedTicket.ticket_holder_guest_id == guest_id)
+            .all())
 
 #functions for ticket_holder_types
 def create_ticket_holder_type(db: Session, ticket_holder_type: TicketHolderTypeCreate):
