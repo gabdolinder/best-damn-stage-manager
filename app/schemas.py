@@ -10,6 +10,9 @@ class TicketHolderBase(BaseModel):
     class Config:
         orm_mode = True  # Enables ORM mode to work with SQLAlchemy models
 
+class TicketHolderGet(TicketHolderBase):
+    ticket_holder_id: int
+
 # Schema used for creating a new TicketHolder, inheriting from TicketHolderBase
 class TicketHolderCreate(TicketHolderBase):
     pass

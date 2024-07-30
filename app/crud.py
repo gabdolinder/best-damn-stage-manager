@@ -3,8 +3,6 @@ from sqlalchemy.exc import IntegrityError
 from models import TicketHolder, TicketHolderGuest, IssuedTicket, TicketType, TicketHolderType
 from schemas import TicketHolderCreate, TicketHolderGuestCreate, IssuedTicketCreate, TicketTypeCreate, TicketHolderTypeCreate
 
-
-
 #functions for issued_tickets
 def create_issued_ticket(db: Session, issued_ticket: IssuedTicketCreate):
     db_issued_ticket = IssuedTicket(**issued_ticket.dict())
@@ -16,6 +14,22 @@ def create_issued_ticket(db: Session, issued_ticket: IssuedTicketCreate):
 def get_issued_ticket(db: Session, skip: int = 0, limit: int = 10):
     return db.query(IssuedTicket).offset(skip).limit(limit).all()
 
+def get_artist_issued_tickets(db: Session, artist_id: int):
+    return (db.query(TicketType.ticket_type_name, TicketType.ticket_type_id, IssuedTicket.ticket_id, IssuedTicket.used)
+            .join(IssuedTicket)
+            .filter(IssuedTicket.ticket_holder_id == artist_id)
+            .all())
+
+def use_issued_ticket(db: Session, ticket_id: int):
+    db_issued_ticket = db.query(IssuedTicket).filter(IssuedTicket.ticket_id == ticket_id).first()
+    db_issued_ticket.used = True
+    db.commit()
+
+def return_issued_ticket(db: Session, ticket_id: int):
+    db_issued_ticket = db.query(IssuedTicket).filter(IssuedTicket.ticket_id == ticket_id).first()
+    db_issued_ticket.used = False
+    db.commit()
+
 #functions for ticket_holder_guests
 def create_ticket_holder_guest(db: Session, ticket_holder_guest: TicketHolderGuestCreate):
     db_ticket_holder_guest = TicketHolderGuest(**ticket_holder_guest.dict())
@@ -26,6 +40,20 @@ def create_ticket_holder_guest(db: Session, ticket_holder_guest: TicketHolderGue
 
 def get_ticket_holder_guest(db: Session, skip: int = 0, limit: int = 10):
     return db.query(TicketHolderGuest).offset(skip).limit(limit).all()
+
+def get_specific_ticket_holder_guests(db: Session, artist_id: int ):
+    return db.query(TicketHolderGuest).filter(TicketHolderGuest.guest_to_artist_id == artist_id).all()
+
+def get_specific_guest(db: Session, guest_id: int):
+    return (db.query(TicketHolderGuest.ticket_holder_guest_name, TicketHolderGuest.ticket_holder_guest_id, TicketHolderGuest.guest_to_artist_id, TicketHolder.ticket_holder_name)
+            .join(TicketHolder).filter(TicketHolderGuest.ticket_holder_guest_id == guest_id)
+            .first())
+
+def get_guest_issued_tickets(db: Session, guest_id: int):
+    return (db.query(TicketType.ticket_type_name, TicketType.ticket_type_id, IssuedTicket.ticket_id, IssuedTicket.used)
+            .join(IssuedTicket)
+            .filter(IssuedTicket.ticket_holder_guest_id == guest_id)
+            .all())
 
 #functions for ticket_holder_types
 def create_ticket_holder_type(db: Session, ticket_holder_type: TicketHolderTypeCreate):
@@ -48,6 +76,9 @@ def create_ticket_holder(db: Session, ticket_holder: TicketHolderCreate):
 
 def get_ticket_holder(db: Session, skip: int = 0, limit: int = 10):
     return db.query(TicketHolder).offset(skip).limit(limit).all()
+
+def get_specific_ticket_holder(db: Session, id: int):
+    return db.query(TicketHolder).filter(TicketHolder.ticket_holder_id == id).first()
 
 #functions for ticket_type
 def create_ticket_type(db: Session, ticket_type: TicketTypeCreate):

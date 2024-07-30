@@ -1,39 +1,58 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 from .dependencies import templates
-
-guest_list = [
-    {"id": 11, "guest_to_artist_id": 1, "ticket_holder_guest_name": "Erik Johansson",},
-    {"id": 12, "guest_to_artist_id": 1, "ticket_holder_guest_name": "Oliver Nilsson",},
-    {"id": 13, "guest_to_artist_id": 3, "ticket_holder_guest_name": "Fredrik Augustsson",}
-]
-
-artist_list = [
-    {"id": 1, "ticket_holder_name": "Anders Andersson", 'related_act':'Artistjanne',},
-    {"id": 2, "ticket_holder_name": "Johan Olsson", 'related_act':'Artistjanne',},
-    {"id": 3, "ticket_holder_name": "Rickard Svensson", 'related_act': 'Greger',}
-]
+from database import get_db
+from sqlalchemy.orm import Session
+from crud import (
+    get_ticket_holder, 
+    get_specific_ticket_holder, 
+    get_specific_ticket_holder_guests, 
+    get_artist_issued_tickets, 
+    use_issued_ticket, 
+    return_issued_ticket,
+)
+from fastapi.responses import RedirectResponse
 
 router = APIRouter()
 
 @router.get("/", response_class=HTMLResponse)
-def render_artist_list(request: Request):
-    context = {'request': request, 'artist_list': artist_list}
+def render_artist_list(request: Request, db: Session = Depends(get_db)):
+
+    ticket_holders = get_ticket_holder(db)
+
+    context = {'request': request, 
+               'ticket_holders': ticket_holders,}
     return templates.TemplateResponse("artist.html", context)
 
+
 @router.get("/{artist_id}", response_class=HTMLResponse)
-def get_artist(artist_id: int, request: Request):
+def get_artist(artist_id: int, request: Request, db: Session = Depends(get_db)):
 
     # Find all data for artist with the given artist_id
-    for item in artist_list:
-        if item['id'] == artist_id:
-            artist = item
+    artist = get_specific_ticket_holder(db, artist_id)
 
     # Create an artist specific guest list for the given artist_id
-    artist_guests = []
-    for item in guest_list:
-        if item['guest_to_artist_id'] == artist_id:
-            artist_guests.append(item)
+    artist_guests = get_specific_ticket_holder_guests(db, artist_id)
 
-    context = {'request': request, 'artist': artist, 'artist_guests': artist_guests}
+    # Find all tickets for artist
+    artist_tickets = get_artist_issued_tickets(db, artist_id)
+
+    context = {'request': request, 
+               'artist': artist, 
+               'artist_guests': artist_guests, 
+               'artist_tickets': artist_tickets,}
     return templates.TemplateResponse("artist-detail.html", context)
+
+@router.get("/{artist_id}/use_ticket/{ticket_id}", response_class=HTMLResponse)
+def use_artist_ticket(artist_id: int, ticket_id: int, request: Request, db: Session = Depends(get_db)):
+    use_issued_ticket(db, ticket_id)
+
+    url = '/artist/' + str(artist_id)
+    return RedirectResponse(url=url, status_code=status.HTTP_302_FOUND)
+
+@router.get("/{artist_id}/return_ticket/{ticket_id}", response_class=HTMLResponse)
+def return_artist_ticket(artist_id: int, ticket_id: int, request: Request, db: Session = Depends(get_db)):
+    return_issued_ticket(db, ticket_id)
+
+    url = '/artist/' + str(artist_id)
+    return RedirectResponse(url=url, status_code=status.HTTP_302_FOUND)
