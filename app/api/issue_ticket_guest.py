@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, status, HTTPException, UploadFile, File, Query
 from sqlalchemy.orm import Session
 from models import TicketHolder, TicketType, IssuedTicket, TicketHolderGuest
 from database import get_db
@@ -12,6 +12,79 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+# Insert single ticket
+@router.post("/single_guest_ticket", status_code=status.HTTP_201_CREATED)
+def upload_single_guest_ticket(
+    ticket_holder_guest_name: str = Query(..., description="Name of the guest"),
+    ticket_type_name: str = Query(..., description="Type of ticket"),
+    ticket_holder_name: str = Query(..., description="Name of the artist"),
+    related_act: str = Query(..., description="Related act of the artist"),
+    used: bool = Query(False, description="Indicates if the ticket is used"),
+    db: Session = Depends(get_db)
+):
+    try:
+        process_single_guest_ticket_data(ticket_holder_name, related_act, ticket_type_name, ticket_holder_guest_name, used, db)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        logger.error(f"Error processing data: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error processing data: {str(e)}")
+
+    return {"message": "Data inserted"}
+
+# I would prefer to use the same function as for csv files but can't be bothered to rewrite it right now
+def process_single_guest_ticket_data(ticket_holder_name: str, related_act: str, ticket_type_name: str, ticket_holder_guest_name: str, used: bool, db: Session):
+    # Check that ticket_type is correct
+    ticket_type = db.query(TicketType).filter(TicketType.ticket_type_name == ticket_type_name).first()
+    if not ticket_type:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Ticket type {ticket_type_name} does not exist")
+
+    # Check if a ticket holder with the same name and act already exists
+    ticket_holder = db.query(TicketHolder).filter(
+        TicketHolder.ticket_holder_name == ticket_holder_name,
+        TicketHolder.related_act == related_act
+    ).first()
+
+    if not ticket_holder:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Ticket holder {ticket_holder_name} with act {related_act} does not exist")
+
+    # Check if a ticket holder guest with the same name, correlated artist, and act already exists
+    ticket_holder_guest = db.query(TicketHolderGuest).filter(
+        TicketHolderGuest.ticket_holder_guest_name == ticket_holder_guest_name,
+        TicketHolderGuest.artist_related_act == related_act,
+        TicketHolderGuest.guest_to_artist_id == ticket_holder.ticket_holder_id
+    ).first()
+
+    # Create or get the ticket holder guest
+    if not ticket_holder_guest:
+        ticket_holder_guest = TicketHolderGuest(
+            ticket_holder_guest_name=ticket_holder_guest_name,
+            guest_to_artist_id=ticket_holder.ticket_holder_id,
+            artist_related_act=related_act
+        )
+        db.add(ticket_holder_guest)
+        db.commit()
+        db.refresh(ticket_holder_guest)
+
+    # Check if a ticket holder guest with the same name and ticket type already exists
+    existing_ticket = db.query(IssuedTicket).filter(
+        IssuedTicket.ticket_holder_guest_id == ticket_holder_guest.ticket_holder_guest_id,
+        IssuedTicket.ticket_type_id == ticket_type.ticket_type_id
+    ).first()
+
+    if existing_ticket:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Ticket for {ticket_holder_guest_name} with ticket {ticket_type_name} already exists")
+
+    # Create the issued ticket
+    issued_ticket = IssuedTicket(
+        ticket_holder_guest_id=ticket_holder_guest.ticket_holder_guest_id,
+        used=used,
+        ticket_type_id=ticket_type.ticket_type_id
+    )
+    db.add(issued_ticket)
+    db.commit()
+    db.refresh(issued_ticket)
 
 
 class CSVData(BaseModel):
