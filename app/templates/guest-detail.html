@@ -17,8 +17,8 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
                 {% for ticket in guest_tickets %}
+                <tr>
                     <td> {{ ticket['ticket_type_name'] }} </td>
                     <td>  
                         {% if ticket['used'] == True %} <i class="bi-check-square-fill" style="color:green"></i> Checked in
@@ -26,8 +26,8 @@
                         {% endif %}
                     </td>
                     <td><a class="btn btn-primary btn-sm" href="/guestlist/{{ guest['ticket_holder_guest_id'] }}/use_ticket/{{ ticket['ticket_id'] }}">Check In</a></td>
-                {% endfor %}
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
