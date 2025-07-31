@@ -1,45 +1,29 @@
-from fastapi import FastAPI, Depends
-import uvicorn
-from api import ticket_holders, ticket_holder_guests, issued_tickets, ticket_types, ticket_holder_types, issue_ticket_artist, issue_ticket_guest
-from database import Base, engine, SessionLocal
-from crud import insert_ticket_type_data
-from contextlib import asynccontextmanager
-from frontend import login, artist, guestlist, home
+from fastapi import FastAPI
+from database import init_db, get_db
+from api import ticket, transport, stage, artist, lodge
+from crud.ticket import insert_ticket_types, insert_ticket_holder_types
+from crud.stage import insert_stage
+
+app = FastAPI()
+
+@app.on_event("startup")
+
+def startup():
+    init_db()
+    db = get_db()  
+    insert_ticket_types(db)
+    insert_ticket_holder_types(db)
+    insert_stage(db)
+    db.close() 
 
 
-# Create tables
-Base.metadata.create_all(bind=engine)
+app.include_router(artist.router, prefix="/artist", tags=["API/artist"])
+app.include_router(lodge.router, prefix="/lodge", tags=["API/lodge"])
+app.include_router(ticket.router, prefix="/ticket", tags=["API/ticket"])
+app.include_router(transport.router, prefix="/transport", tags=["API/transport"])
+app.include_router(stage.router, prefix="/stage", tags=["API/stage"])
 
-def on_startup():
-    db = SessionLocal()
-    try:
-        insert_ticket_type_data(db)
-    finally:
-        db.close()
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    on_startup()
-    yield
-
-
-app = FastAPI(lifespan=lifespan)
-
-# Frontend routes
-app.include_router(home.router, tags=["home"])
-app.include_router(login.router, prefix="/login", tags=["login"])
-app.include_router(artist.router, prefix="/artist", tags=["artist"])
-app.include_router(guestlist.router, prefix="/guestlist", tags=["guestlist"])
-
-# API routes
-app.include_router(ticket_holders.router, prefix="/ticket_holders", tags=["API/ticket_holders"])
-app.include_router(ticket_holder_guests.router, prefix="/ticket_holder_guests", tags=["API/ticket_holder_guests"])
-app.include_router(issued_tickets.router, prefix="/issued_tickets", tags=["API/issued_tickets"])
-app.include_router(ticket_types.router, prefix="/ticket_types", tags=["API/ticket_types"])
-app.include_router(ticket_holder_types.router, prefix="/ticket_holder_types", tags=["API/ticket_holder_types"])
-app.include_router(issue_ticket_artist.router, prefix="/issue_ticket_artist", tags=["API/issue_ticket_artist"])
-app.include_router(issue_ticket_guest.router, prefix="/issue_ticket_guest", tags=["API/issue_ticket_guest"])
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,18 +1,18 @@
-import os
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
+from sqlmodel import SQLModel
+
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+engine = create_engine(DATABASE_URL, echo=True)
 
-# Dependency
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+def init_db():
+    print("Creating tables:", SQLModel.metadata.tables.keys())  # Debug print
+    SQLModel.metadata.create_all(bind=engine)
+
 def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    return SessionLocal()
